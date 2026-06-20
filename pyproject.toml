@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "beast403"
+version = "0.1.0"
+description = "Accuracy-first 403 bypass scanner that verifies findings against live oracles to suppress false positives."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "sand8storm" }]
+keywords = ["security", "bug-bounty", "403", "bypass", "pentest", "web-security"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Security",
+    "Environment :: Console",
+]
+dependencies = ["httpx>=0.27"]
+
+[project.urls]
+Homepage = "https://github.com/sand8storm/Beast403"
+Issues = "https://github.com/sand8storm/Beast403/issues"
+
+[project.scripts]
+beast403 = "beast403.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["beast403*"]
