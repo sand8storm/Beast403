@@ -11,6 +11,7 @@ database of server error pages.
 """
 from __future__ import annotations
 
+import sys
 import uuid
 from typing import Optional
 
@@ -32,6 +33,14 @@ async def calibrate(
 ) -> OracleSet:
     # baseline: the target itself
     base_f = extract_features(await engine.send(target))
+
+    # not a 4xx -> nothing to bypass; make that loud so results aren't misread
+    if not (400 <= base_f.status < 500):
+        print(
+            f"[!] warning: target path returned {base_f.status} -- either already "
+            f"open or bypassed at the access layer; there is no 403 to bypass.",
+            file=sys.stderr,
+        )
 
     # not-found: random garbage paths
     nf_features: list[ResponseFeatures] = []

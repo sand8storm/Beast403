@@ -12,6 +12,7 @@ from .paths import PathTechnique
 from .headers import HeaderTechnique
 from .methods import MethodTechnique
 from .encoding import EncodingTechnique
+from .params import ParamTechnique
 
 ALL_TECHNIQUES = [
     PathTechnique(),
@@ -21,9 +22,13 @@ ALL_TECHNIQUES = [
 ]
 
 
-def select(target: Request, profile: TargetProfile) -> list[Probe]:
+def select(target: Request, profile: TargetProfile, *, params: bool = False) -> list[Probe]:
+    # ParamTechnique is opt-in: added only when -p is set, never in ALL_TECHNIQUES.
+    techniques = list(ALL_TECHNIQUES)
+    if params:
+        techniques.append(ParamTechnique(enabled=True))
     probes: list[Probe] = []
-    for tech in ALL_TECHNIQUES:
+    for tech in techniques:
         if tech.applies_to(profile):
             probes.extend(tech.generate(target, profile))
     return probes

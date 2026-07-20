@@ -17,6 +17,7 @@ from ..core.models import Request, Probe, TargetProfile
 _METHODS = ["POST", "HEAD", "OPTIONS", "PUT", "DELETE", "PATCH", "TRACE", "CONNECT"]
 _CASE_VARIANTS = ["get", "Get", "gEt"]          # case-sensitive rule vs tolerant parser
 _OVERRIDE_HEADERS = ["X-HTTP-Method-Override", "X-HTTP-Method", "X-Method-Override"]
+_OVERRIDE_VALUES = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 
 
 class MethodTechnique:
@@ -31,9 +32,10 @@ class MethodTechnique:
         for m in _CASE_VARIANTS:
             yield self._probe(target, m, dict(target.headers), f"method case '{m}'")
         for h in _OVERRIDE_HEADERS:
-            yield self._probe(
-                target, "POST", {**target.headers, h: "GET"}, f"{h}: GET"
-            )
+            for v in _OVERRIDE_VALUES:
+                yield self._probe(
+                    target, "POST", {**target.headers, h: v}, f"{h}: {v}"
+                )
 
     def _probe(self, target, method, headers, label) -> Probe:
         return Probe(

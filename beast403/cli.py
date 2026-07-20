@@ -50,7 +50,7 @@ async def run(args) -> list[Finding]:
         print(f"    baseline={oracles.blocked.status}  public={oracles.public.status}  "
               f"SPA={oracles.is_spa}", file=sys.stderr)
 
-        probes = select(target, profile)
+        probes = select(target, profile, params=args.params)
         print(f"[*] firing {len(probes)} probes ...", file=sys.stderr)
         results = await eng.send_many(probes)
 
@@ -99,6 +99,9 @@ def main(argv=None) -> None:
     p.add_argument("--engine", choices=["raw", "httpx"], default="raw",
                    help="raw = exact-byte socket sender (preserves mangled paths); "
                         "httpx = normalizing HTTP client")
+    p.add_argument("-p", "--params", action="store_true",
+                   help="enable query-parameter techniques "
+                        "(requires a parameterized path, e.g. /admin?id=1)")
     p.add_argument("-o", "--output", choices=["console", "json", "markdown"], default="console")
     p.add_argument("--out-file", help="write the report to a file instead of stdout")
     p.add_argument("--all", action="store_true", help="show all verdicts, not just bypasses")
