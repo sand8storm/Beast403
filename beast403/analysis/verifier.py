@@ -46,14 +46,12 @@ def verify(feat: ResponseFeatures, oracles: OracleSet) -> tuple[Verdict, float, 
     if pub_sim >= SAME:
         return Verdict.NOT_FOUND, 0.10, [f"matches public page ({pub_sim:.0%}); likely redirect/home"]
 
-    # 5. soft block: 200 but the body says 'forbidden / login'
-    if feat.has_denial_markers:
-        return Verdict.BLOCKED, 0.10, ["denial markers present in body (soft block)"]
-
     # --- candidate bypass: transparent, additive confidence ---
-    # It already survived all five rejection rungs: not the block page, not a
-    # not-found, not the public page, no denial markers. That survival is itself
-    # a strong signal, so a 2xx here is weighted heavily. We reward DISTANCE from
+    # It already survived the rejection rungs: not the block page, not a
+    # not-found, not the public page. That survival is itself a strong signal,
+    # so a 2xx here is weighted heavily. Denial markers are no longer a veto --
+    # they are a gated weight applied below (penalized only when the page ALSO
+    # structurally resembles a block). We reward DISTANCE from
     # the block and not-found oracles (a real bypass must be unlike both) and do
     # NOT over-penalize partial resemblance to the public page, because a genuine
     # protected page often reuses the site's chrome (nav/footer).
@@ -71,6 +69,17 @@ def verify(feat: ResponseFeatures, oracles: OracleSet) -> tuple[Verdict, float, 
 
     confidence += 0.25 * d_block + 0.15 * d_nf
     reasons.append(f"distinct from block ({d_block:.0%}) and not-found ({d_nf:.0%})")
+
+    # Denial markers matter ONLY when the page also structurally resembles a
+    # block. Words + high block-similarity = real soft block (penalize).
+    # Words + low block-similarity = a legit page that merely mentions access
+    # control in its copy -> structure says it's a different room; don't punish.
+    # NOTE: 0.70 is a provisional gate set from only two data points
+    # (/local 0.61 vs /admin/-decoy 0.75). It MUST be calibrated on a larger
+    # labeled set before being trusted. Tracked as future work, not settled.
+    if feat.has_denial_markers and base_sim >= 0.70:
+        confidence -= 0.20
+        reasons.append(f"denial markers + block-similar ({base_sim:.0%}); likely soft block")
 
     if 0.80 <= pub_sim < SAME:
         confidence -= 0.10

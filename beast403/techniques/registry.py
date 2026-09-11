@@ -13,12 +13,16 @@ from .headers import HeaderTechnique
 from .methods import MethodTechnique
 from .encoding import EncodingTechnique
 from .params import ParamTechnique
+from .common_files import CommonFileTechnique
+from .useragent import UserAgentTechnique
 
 ALL_TECHNIQUES = [
     PathTechnique(),
     HeaderTechnique(),
     MethodTechnique(),
     EncodingTechnique(),
+    CommonFileTechnique(),
+    UserAgentTechnique(),
 ]
 
 

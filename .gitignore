@@ -24,3 +24,6 @@ ground_truth.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Backups
+*.bak

@@ -38,7 +38,7 @@ async def _bench(gt_path: str, min_conf: float):
         args = SimpleNamespace(
             url=base, path=t["path"], concurrency=15, delay_ms=0, timeout=8.0,
             public_path="/", auth_header=None, output="console", all=False,
-            min_confidence=min_conf, engine="raw",
+            min_confidence=min_conf, engine="raw", params=None,
         )
         findings = await run(args)
         predicted = any(f.verdict == Verdict.BYPASS and f.confidence >= min_conf

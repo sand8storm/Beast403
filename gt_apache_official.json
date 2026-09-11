@@ -1,0 +1,13 @@
+{
+  "base": "http://localhost:8081",
+  "targets": [
+    {"path": "/admin/",                        "bypassable": true},
+    {"path": "/private/",                       "bypassable": false},
+    {"path": "/static/internal/users",          "bypassable": true},
+    {"path": "/local/",                         "bypassable": true},
+    {"path": "/trim/",                          "bypassable": true},
+    {"path": "/api/v2/secrets",                 "bypassable": true},
+    {"path": "/services/myservice/status",      "bypassable": true},
+    {"path": "/user_agent",                     "bypassable": true}
+  ]
+}

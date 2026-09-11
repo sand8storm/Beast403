@@ -19,7 +19,10 @@ from ..core.models import Request, Probe, TargetProfile
 def _variants(seg: str, bare: str) -> list[tuple[str, str, str]]:
     # seg  = full path with leading slash, e.g. "/admin"
     # bare = without leading slash,        e.g. "admin"
-    return [
+    variants: list[tuple[str, str, str]] = []
+    if seg.endswith("/"):
+        variants.append(("trailing slash removal", seg.rstrip("/"), ""))
+    variants += [
         ("trailing slash",          f"{seg}/",          ""),
         ("leading double slash",    f"//{bare}",         ""),
         ("trailing double slash",   f"{seg}//",          ""),
@@ -35,6 +38,7 @@ def _variants(seg: str, bare: str) -> list[tuple[str, str, str]]:
         ("trailing question",       f"{seg}?",           ""),
         ("trailing hash",           f"{seg}#",           ""),
         ("trailing space",          f"{seg}%20",         ""),
+        ("trailing non-breaking space", f"{seg}%c2%a0",  ""),
         ("trailing tab",            f"{seg}%09",         ""),
         ("trailing CR",             f"{seg}%0d",         ""),
         ("trailing LF",             f"{seg}%0a",         ""),
@@ -47,6 +51,7 @@ def _variants(seg: str, bare: str) -> list[tuple[str, str, str]]:
         ("ext .css",                f"{seg}.css",        ""),
         ("semicolon ext ;.css",     f"{seg};.css",       "java"),
     ]
+    return variants
 
 
 def _stack_known_nonjava(profile: TargetProfile) -> bool:
@@ -71,6 +76,20 @@ class PathTechnique:
             yield Probe(
                 technique=self.name,
                 label=f"{label} -> {new_path}",
+                request=Request(
+                    method=target.method,
+                    url=target.url,
+                    raw_path=new_path,
+                    headers=dict(target.headers),
+                    http_version=target.http_version,
+                ),
+            )
+        parts = seg.lstrip("/").split("/")
+        if len(parts) > 1:
+            new_path = "/" + parts[0].upper() + "/" + "/".join(parts[1:])
+            yield Probe(
+                technique=self.name,
+                label=f"uppercase first segment -> {new_path}",
                 request=Request(
                     method=target.method,
                     url=target.url,
