@@ -55,6 +55,14 @@ URL → fingerprint → oracles → techniques → responses → features → ve
 
 ## Installation
 
+From PyPI:
+
+```bash
+pip install beast403
+```
+
+From source:
+
 ```bash
 git clone https://github.com/sand8storm/Beast403.git
 cd Beast403
@@ -160,6 +168,10 @@ virtualenv. Re-activate it with `source .venv/bin/activate`.
 **The tool finds nothing / paths look normalized**
 Make sure you're on the default `--engine raw`. The `httpx` engine normalizes
 paths and can hide path-based bypasses.
+
+## Author
+
+Built by **Michel Aljed** ([cyborgt.me](https://cyborgt.me)), offensive security engineer and penetration tester, Damascus. GitHub: [sand8storm](https://github.com/sand8storm).
 
 ## License
 
